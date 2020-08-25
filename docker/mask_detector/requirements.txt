@@ -1,0 +1,4 @@
+imutils
+tensorflow
+numpy
+matplotlib
