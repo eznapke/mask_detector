@@ -11,6 +11,9 @@ COPY . /app
 RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get install -y python3-opencv
+
+
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Make port 6004 available to the world outside this container
