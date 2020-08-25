@@ -1,4 +1,5 @@
-imutils
+opencv-contrib-python
 tensorflow
 numpy
 matplotlib
+imutils
