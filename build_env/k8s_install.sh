@@ -14,7 +14,7 @@ sudo usermod -a -G microk8s $USER
 sleep 5
 echo "@@@ $(date): Updating the cronjob to run proxy at boot"
 crontab -l > mycron
-echo "@reboot /home/vagrant/pm_k8s_service/build_env/at_boot.sh" >> mycron
+echo "@reboot /home/vagrant/mask_detector/build_env/at_boot.sh" >> mycron
 crontab mycron
 rm mycron
 sleep 10
