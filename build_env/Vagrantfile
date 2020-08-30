@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
     v.gui = false
   end
 
-  config.vm.hostname = "md_detector"
+  config.vm.hostname = "opencv"
   config.vm.box = "ubuntu/bionic64"
   config.vm.network "private_network", type: "dhcp"
   config.vm.provision "shell", path: "bootstrap.sh"
