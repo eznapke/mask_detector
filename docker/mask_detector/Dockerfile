@@ -11,4 +11,4 @@ COPY install-packages.sh .
 RUN ./install-packages.sh
 
 # Run app.py when the container launches
-CMD ["python", "threadtest_ee_trial.py"]
+CMD ["python", "threadtest.py"]

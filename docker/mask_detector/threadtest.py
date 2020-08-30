@@ -104,7 +104,7 @@ maskNet = load_model(args["model"])
 
 class ThreadedCamera(object):
     def __init__(self, src=0):
-        self.capture = cv2.VideoCapture("rtsp://10.143.168.99:5554/camera", cv2.CAP_FFMPEG)
+        self.capture = cv2.VideoCapture("rtsp://192.168.86.94:5554/camera", cv2.CAP_FFMPEG)
         self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 2)
 
         while not self.capture.isOpened():
