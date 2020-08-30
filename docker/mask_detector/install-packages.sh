@@ -21,6 +21,7 @@ apt-get -y upgrade
 pip install opencv-python
 pip install imutils
 pip install tensorflow
+pip install matplotlib
 
 # apt-get -y install libgstreamer0.10-0-dbg libgstreamer0.10-0 libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev 
 # apt-get -y install libunicap2 libunicap2-dev libdc1394-22-dev libdc1394-22 libdc1394-utils libv4l-0 libv4l-dev
