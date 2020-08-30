@@ -8,6 +8,7 @@ Vagrant.configure("2") do |config|
     v.name = "mask_detector"
     v.memory = 16384
     v.cpus = 6
+    v.disk = disk, name: "primary", size: "5GB"
     v.gui = false
   end
 
