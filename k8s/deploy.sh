@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-external_ip=$(hostname  -I | cut -f2 -d' ')
+external_ip=$(hostname  -I | cut -f1 -d' ')
 
 echo "@@@ $(date): Create the Namespace"
 microk8s.kubectl create namespace md-service
