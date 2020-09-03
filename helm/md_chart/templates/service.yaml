@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pm_chart.fullname" . }}
+  labels:
+{{ include "pm_chart.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+  selector:
+    app/name: {{ include "pm_chart.name" . }}
+    app/instance: {{ .Release.Name }}
+  externalIPs:
+    - {{ .Values.service.externalIP }}

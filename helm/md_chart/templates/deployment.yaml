@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pm_chart.fullname" . }}
+  labels:
+{{ include "pm_chart.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app/name: {{ include "pm_chart.name" . }}
+      app/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app/name: {{ include "pm_chart.name" . }}
+        app/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          - containerPort: 5200               
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: INFLUX_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pm_chart.fullname" . }}-configmap
+                  key: influx.host
+            - name: INFLUX_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pm_chart.fullname" . }}-configmap
+                  key: influx.port
+            - name: INFLUX_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pm_chart.fullname" . }}-configmap
+                  key: influx.db
+            - name: EXCLUDE_FILTER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "pm_chart.fullname" . }}-configmap
+                  key: filter.exclude
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
