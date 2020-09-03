@@ -21,7 +21,7 @@ service:
 configmap:
   namespace: md-service
   camera_ip: "192.168.86.91"
-  camera_port: 5554
+  camera_port: '"5554"'
 
 
 resources:
