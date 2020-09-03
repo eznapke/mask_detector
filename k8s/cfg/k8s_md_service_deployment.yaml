@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: md-service
+  name: md-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: md-service
+  template:
+    metadata:
+      labels:
+        app: md-service
+    spec:
+      containers:
+      - image: bmceniery/md-service:latest
+        name: md-service
+        ports:
+        - containerPort: 5200
+        resources:
+          limits:
+            cpu: "1"
+          requests:
+            cpu: "1"          
+          limits:
+            memory: 768Mi
+          requests:
+            memory: 512Mi
+        env:
+        - name: CAMERA_IP
+          valueFrom:
+            configMapKeyRef:
+              name: md-service-config
+              key: camera.ip
+        - name: CAMERA_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: md-service-config
+              key: camera.port                                         
