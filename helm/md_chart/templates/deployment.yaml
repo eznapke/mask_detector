@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "pm_chart.fullname" . }}
+  name: {{ include "md_chart.fullname" . }}
   labels:
-{{ include "pm_chart.labels" . | indent 4 }}
+{{ include "md_chart.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app/name: {{ include "pm_chart.name" . }}
+      app/name: {{ include "md_chart.name" . }}
       app/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app/name: {{ include "pm_chart.name" . }}
+        app/name: {{ include "md_chart.name" . }}
         app/instance: {{ .Release.Name }}
     spec:
       containers:
@@ -25,27 +25,16 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: INFLUX_HOST
+            - name: CAMERA_IP
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "pm_chart.fullname" . }}-configmap
-                  key: influx.host
-            - name: INFLUX_PORT
+                  name: {{ include "md_chart.fullname" . }}-configmap
+                  key: camera.ip
+            - name: CAMERA_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "pm_chart.fullname" . }}-configmap
-                  key: influx.port
-            - name: INFLUX_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "pm_chart.fullname" . }}-configmap
-                  key: influx.db
-            - name: EXCLUDE_FILTER
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "pm_chart.fullname" . }}-configmap
-                  key: filter.exclude
-
+                  name: {{ include "md_chart.fullname" . }}-configmap
+                  key: camera.port
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

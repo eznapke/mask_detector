@@ -1,11 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "pm_chart.fullname" . }}-configmap
+  name: {{ include "md_chart.fullname" . }}-configmap
   namespace: {{ .Values.configmap.namespace }}
 
 data:
-  filter.exclude: {{ .Values.configmap.exclude }}
-  influx.db: {{ .Values.configmap.db }}
-  influx.host: {{ .Values.configmap.db_host }}
-  influx.port: {{ .Values.configmap.db_port }}
+  camera.ip: {{ .Values.configmap.camera.ip }}
+  camera.port: {{ .Values.configmap.camera.port }}
