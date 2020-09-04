@@ -14,7 +14,7 @@ The information below is purely for confirming the mechanics of deploying the Se
 >>kubectl create namespace md-service<br>
 >>helm install --set service.externalIP=(external ip) --name=md-service --namespace=md-service ./md_chart<br>
 
-## Day N - Update App with new camera
+## Day N - Re-direct App to use new camera
 
 - Connect to Bastion via SSH (key based authentication).<br>
 - Update chart version e.g. 0.1.23<br>
