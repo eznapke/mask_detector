@@ -1,5 +1,5 @@
 # Security Surveillence
-The information below is purely for confirming the mechanics of deploying ths app
+The information below is purely for confirming the mechanics of deploying the Security App.<br>
 
 ## Day 0/1 - EKS + App + Cfg
 
@@ -27,7 +27,7 @@ The information below is purely for confirming the mechanics of deploying ths ap
 >>kubectl rollout restart deploy/md-service -n md-service<br>
 >>helm list<br>
 
-Note: In the future the App could support this via a RESTful interface.
+Note: In the future the App will suppoort this via a RESTful interface.
 
 
 ## Tip n Tricks
