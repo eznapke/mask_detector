@@ -13,11 +13,10 @@
 >>microk8s.helm install --set service.externalIP=<external ip> --name=md-service --namespace=md-service ./md_chart<br>
 
 ## Day N - Update App with new camera
-- Connect to Bastion via SSH (key based authentication).<br>
 
-Example:<br>
-- Update chart version to 0.1.23<br>
-- Update chart with new camera IP, 192.168.86.100<br>
+- Connect to Bastion via SSH (key based authentication).<br>
+- Update chart version e.g. 0.1.23<br>
+- Update chart with new camera IP e.g 192.168.86.100<br>
 - Upgrade the chart to push out the updated configmap<br>
 - Restart the service to inject the configmap<br>
 >>sed -i "/version:/c\version: 0.1.23" md_chart/Chart.yaml<br>
