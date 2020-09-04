@@ -7,7 +7,7 @@ The information below is purely for confirming the mechanics of deploying ths ap
 - Connect to Bastion via SSH (key based authentication).<br>
 - Install Security App via Helm.<br>
 - The public IP (to expose the service) should be passed to the Helm Chart <br>
-- Security App container pulled down from dockerhub.<br>
+- Security App container is pulled down from DockerHub.<br>
 
 >>git clone https://gitlab.mana.ericssondevops.com/EPABME/mask_detector.git<br>
 >>cd /mask_detector/helm<br>
