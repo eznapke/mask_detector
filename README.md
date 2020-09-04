@@ -11,7 +11,7 @@ The information below is purely for confirming the mechanics of deploying ths ap
 
 >>tar -xvf md_chart.tar<br>
 >>microk8s.kubectl create namespace md-service<br>
->>microk8s.helm install --set service.externalIP=<external ip> --name=md-service --namespace=md-service ./md_chart<br>
+>>microk8s.helm install --set service.externalIP=(external ip) --name=md-service --namespace=md-service ./md_chart<br>
 
 ## Day N - Update App with new camera
 
