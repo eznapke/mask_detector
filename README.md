@@ -11,8 +11,8 @@ The information below is purely for confirming the mechanics of deploying ths ap
 
 >>git clone https://gitlab.mana.ericssondevops.com/EPABME/mask_detector.git<br>
 >>cd /mask_detector/helm<br>
->>microk8s.kubectl create namespace md-service<br>
->>microk8s.helm install --set service.externalIP=(external ip) --name=md-service --namespace=md-service ./md_chart<br>
+>>kubectl create namespace md-service<br>
+>>helm install --set service.externalIP=(external ip) --name=md-service --namespace=md-service ./md_chart<br>
 
 ## Day N - Update App with new camera
 
@@ -23,19 +23,19 @@ The information below is purely for confirming the mechanics of deploying ths ap
 - Restart the service to inject the configmap<br>
 >>sed -i "/version:/c\version: 0.1.23" md_chart/Chart.yaml<br>
 >>sed -i "/camera_ip:/c\  camera_ip: \"192.168.86.100\"" md_chart/values.yaml<br>
->>microk8s.helm upgrade md-service ./md_chart/<br>
->>microk8s.helm list<br>
->>microk8s.kubectl rollout restart deploy/md-service -n md-service<br>
+>>helm upgrade md-service ./md_chart/<br>
+>>helm list<br>
+>>kubectl rollout restart deploy/md-service -n md-service<br>
 
 Note: In the future the App could support this via a RESTful interface.
 
 
 ## Tip n Tricks
->>microk8s.helm install --set service.externalIP=$(hostname -I | cut -f1 -d' ') --debug --dry-run md_chart/<br>
->>microk8s.helm install --set service.externalIP=$(hostname -I | cut -f1 -d' ') --name=md-service --namespace=md-service ./md_chart<br>
+>>helm install --set service.externalIP=$(hostname -I | cut -f1 -d' ') --debug --dry-run md_chart/<br>
+>>helm install --set service.externalIP=$(hostname -I | cut -f1 -d' ') --name=md-service --namespace=md-service ./md_chart<br>
 
->>microk8s.helm history md-service<br>
->>microk8s.helm delete --purge md-service<br>
+>>helm history md-service<br>
+>>helm delete --purge md-service<br>
 
 ## Lens Integration
->>microk8s.kubectl config view --minify --raw<br>
+>>kubectl config view --minify --raw<br>
