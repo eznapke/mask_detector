@@ -14,18 +14,19 @@
 
 ## Day N - Update App with new camera
 - Connect to Bastion via SSH (key based authentication).<br>
-- Update the chart version<br>
->>sed -i "/version:/c\version: 0.1.23" md_chart/Chart.yaml<br>
 
-- Update chart with new camera IP and Port<br>
->>sed -i "/camera_ip:/c\  camera_ip: \"192.168.86.100\"" md_chart/values.yaml<br>
-
+Example:<br>
+- Update chart version to 0.1.23<br>
+- Update chart with new camera IP, 192.168.86.100<br>
 - Update the configmap for the service<br>
+- Push the updated configmap out to the service<br>
+>>sed -i "/version:/c\version: 0.1.23" md_chart/Chart.yaml<br>
+>>sed -i "/camera_ip:/c\  camera_ip: \"192.168.86.100\"" md_chart/values.yaml<br>
 >>microk8s.helm upgrade md-service ./md_chart/<br>
 >>microk8s.helm list<br>
-
-- Push the Update the configmap for t<br>
 >>microk8s.kubectl rollout restart deploy/md-service -n md-service<br>
+
+Note: In the future the App could support this via a RESTful interface.
 
 ## Lens Integration
 >>microk8s.kubectl config view --minify --raw<br>
