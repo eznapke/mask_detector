@@ -1,4 +1,5 @@
 # Security Surveillence
+The information below is purely for confirming the mechanics of deploying ths app
 
 ## Day 0/1 - EKS + App + Cfg
 
