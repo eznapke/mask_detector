@@ -24,8 +24,8 @@ The information below is purely for confirming the mechanics of deploying ths ap
 >>sed -i "/version:/c\version: 0.1.23" md_chart/Chart.yaml<br>
 >>sed -i "/camera_ip:/c\  camera_ip: \"192.168.86.100\"" md_chart/values.yaml<br>
 >>helm upgrade md-service ./md_chart/<br>
->>helm list<br>
 >>kubectl rollout restart deploy/md-service -n md-service<br>
+>>helm list<br>
 
 Note: In the future the App could support this via a RESTful interface.
 
