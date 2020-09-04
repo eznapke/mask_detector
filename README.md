@@ -1,6 +1,8 @@
 # Security Surveillance
 The information below is purely for confirming the mechanics of deploying the Security App.<br>
 
+The Day N configuration example is just a placeholder.<br>
+
 ## Day 0/1 - EKS + App + Cfg
 
 - Deploy EKS.<br>
@@ -13,6 +15,8 @@ The information below is purely for confirming the mechanics of deploying the Se
 >>cd /mask_detector/helm<br>
 >>kubectl create namespace md-service<br>
 >>helm install --set service.externalIP=(external ip) --name=md-service --namespace=md-service ./md_chart<br>
+
+- Access the App via http://external_ip:8080<br>
 
 ## Day N - Re-direct App to use new camera
 
