@@ -4,7 +4,7 @@
 
 - Deploy EKS.<br>
 - Connect to Bastion via SSH (key based authentication).<br>
-- Helm used to install the Security App.<br>
+- Install Security App via Helm.<br>
 - The public IP (to expose the service) should be passed to the Helm Chart <br>
 - Security App container pulled down from dockerhub.<br>
 
@@ -18,8 +18,8 @@
 Example:<br>
 - Update chart version to 0.1.23<br>
 - Update chart with new camera IP, 192.168.86.100<br>
-- Update the configmap for the service<br>
-- Push the updated configmap out to the service<br>
+- Upgrade the chart to push out the updated configmap<br>
+- Restart the service to inject the configmap<br>
 >>sed -i "/version:/c\version: 0.1.23" md_chart/Chart.yaml<br>
 >>sed -i "/camera_ip:/c\  camera_ip: \"192.168.86.100\"" md_chart/values.yaml<br>
 >>microk8s.helm upgrade md-service ./md_chart/<br>
