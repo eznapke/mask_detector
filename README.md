@@ -28,5 +28,9 @@ The information below is purely for confirming the mechanics of deploying ths ap
 
 Note: In the future the App could support this via a RESTful interface.
 
+
+## Tip n Tricks
+microk8s.helm install --set service.externalIP=$(hostname -I | cut -f2 -d' ') --debug --dry-run md_chart/
+
 ## Lens Integration
 >>microk8s.kubectl config view --minify --raw<br>
