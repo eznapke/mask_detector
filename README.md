@@ -9,7 +9,8 @@ The information below is purely for confirming the mechanics of deploying ths ap
 - The public IP (to expose the service) should be passed to the Helm Chart <br>
 - Security App container pulled down from dockerhub.<br>
 
->>tar -xvf md_chart.tar<br>
+>>git clone https://gitlab.mana.ericssondevops.com/EPABME/mask_detector.git
+>>cd /mask_detector/helm
 >>microk8s.kubectl create namespace md-service<br>
 >>microk8s.helm install --set service.externalIP=(external ip) --name=md-service --namespace=md-service ./md_chart<br>
 
