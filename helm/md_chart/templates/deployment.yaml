@@ -24,17 +24,6 @@ spec:
           - containerPort: 8080               
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: CAMERA_IP
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "md_chart.fullname" . }}-configmap
-                  key: camera.ip
-            - name: CAMERA_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "md_chart.fullname" . }}-configmap
-                  key: camera.port
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
