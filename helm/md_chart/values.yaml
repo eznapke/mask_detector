@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: camo6016/maskdetector
-  tag: 1.4
+  tag: 1.5
   pullPolicy: Always
 
 imagePullSecrets: []
