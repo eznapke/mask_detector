@@ -23,25 +23,6 @@ spec:
           ports:
           - containerPort: 8080               
           - containerPort: 5001
-          - containerPort: 5002
-          - containerPort: 5003
-          - containerPort: 5004
-          - containerPort: 5005
-          - containerPort: 5006
-          - containerPort: 5007
-          - containerPort: 5008
-          - containerPort: 5009
-          - containerPort: 5010
-          - containerPort: 5011
-          - containerPort: 5012
-          - containerPort: 5013
-          - containerPort: 5014
-          - containerPort: 5015
-          - containerPort: 5016
-          - containerPort: 5017
-          - containerPort: 5018
-          - containerPort: 5019
-          - containerPort: 5020
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
