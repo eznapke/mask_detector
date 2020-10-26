@@ -7,11 +7,11 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - name: p_5554
+    - name: p-5554
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.port }}
       protocol: TCP
-    - name: p_5000
+    - name: p-5000
       port: 5000
       targetPort: 5000
       protocol: UDP
