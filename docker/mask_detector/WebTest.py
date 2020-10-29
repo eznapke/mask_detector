@@ -14,6 +14,7 @@ from flask import Response
 from flask import Flask
 from flask import render_template
 import os
+from flask import request
 import dash
 import dash_core_components as dcc
 from threading import Thread
@@ -23,14 +24,23 @@ import datetime
 import imutils
 import time
 import cv2
+import copy
 import logging
-os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
 
 from flask import Flask, Response
 import cv2
 
-CAMERA_IP = os.getenv('CAMERA_IP')
-CAMERA_PORT = os.getenv('CAMERA_PORT')
+
+Address        = "0.0.0.0"
+Camera         = None
+CameraRun      = True
+Frame          = None
+WebRawFrame    = None
+WebDetectFrame = None
+CameraThread   = None
+GenRawJPEGThread = None
+GenDetectJPEGThread = None
 
 def detect_and_predict_mask(frame, faceNet, maskNet):
         # grab the dimensions of the frame and then construct a blob
@@ -57,7 +67,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
                 # filter out weak detections by ensuring the confidence is
                 # greater than the minimum confidence
-                if confidence > args["confidence"]:
+                if confidence > 0.5:
                         # compute the (x, y)-coordinates of the bounding box for
                         # the object
                         box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
@@ -94,120 +104,165 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
         return (locs, preds)
 
 
-class VideoCamera(object):
-    def __init__(self):
-        self.capture = cv2.VideoCapture("rtsp://"+CAMERA_IP+":"+CAMERA_PORT+"/camera", cv2.CAP_FFMPEG)
-        self.capture.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+def VideoCamera():
+    FPS = 1/30
+    FPS_MS = int(FPS * 1000)
 
-        while not self.capture.isOpened():
-            time.sleep(1)
-            print("sleep")
+    global Frame
+    global Camera
+    global CameraRun
+    global Address
 
-        self.status, self.frame = self.capture.read()
+    while CameraRun:
+        (status, Frame) = Camera.read()
+        time.sleep(FPS)
 
-        # FPS = 1/X
-        # X = desired FPS
-        self.FPS = 1/30
-        self.FPS_MS = int(self.FPS * 1000)
+        if status!=True:
 
+            print("Trying to reconnect to a camera at" + Address)
 
-        # Start frame retrieval thread
-        self.thread = Thread(target=self.update, args=())
-        self.thread.daemon = True
-        self.thread.start()
-
-    def update(self):
-        while True:
-            if self.capture.isOpened():
-                (self.status, self.frame) = self.capture.read()
-            time.sleep(self.FPS)
-
-    def get_frame(self):
-        return True, self.frame
-
-    def show_frame(self):
-        cv2.imshow('frame', self.frame)
-        cv2.waitKey(self.FPS_MS)
+            capture = cv2.VideoCapture("rtsp://" + Address + ":5554/camy", cv2.CAP_FFMPEG)
+            capture.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+            time.sleep(2)
+            if capture.isOpened():
+                Camera=capture
 
 
 
-def gen(camera):
+def GenerateRawWebFrame():
     while True:
-        ret, frame = camera.get_frame()
-
-        if ret == False:
-            print("Frame is empty")
+        if str(type(Frame)) == "<class 'NoneType'>":
+            time.sleep(2)
             continue
-        else:
-            # frame = imutils.resize(frame, width=800)
 
-            # detect faces in the frame and determine if they are wearing a
-            # face mask or not
-            (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+        ret, jpeg = cv2.imencode('.jpg', Frame)
+        encodedImage = jpeg.tobytes()
+        global WebRawFrame
+        WebRawFrame = b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n'
 
-            # loop over the detected face locations and their corresponding
-            # locations
-            for (box, pred) in zip(locs, preds):
-                # unpack the bounding box and predictions
-                (startX, startY, endX, endY) = box
-                (mask, withoutMask) = pred
 
-                # determine the class label and color we'll use to draw
-                # the bounding box and text
-                label = "Mask" if mask > withoutMask else "No Mask"
-                color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+def GenerateDetectWebFrame():
+    while True:
 
-                # include the probability in the label
-                label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+        if str(type(Frame)) == "<class 'NoneType'>":
+            time.sleep(2)
+            continue
 
-                # display the label and bounding box rectangle on the output
-                # frame
-                cv2.putText(frame, label, (startX, startY - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-                cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+        frame = copy.copy(Frame)
 
-                # frame = imutils.resize(frame, width=800)
+        # detect faces in the frame and determine if they are wearing a
+        # face mask or not
+        (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+
+        # loop over the detected face locations and their corresponding
+        # locations
+        for (box, pred) in zip(locs, preds):
+            # unpack the bounding box and predictions
+            (startX, startY, endX, endY) = box
+            (mask, withoutMask) = pred
+
+            # determine the class label and color we'll use to draw
+            # the bounding box and text
+            label = "Mask" if mask > withoutMask else "No Mask"
+            color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+
+            # include the probability in the label
+            label = "{}: {:.2f}%".format(label, max(mask, withoutMask) * 100)
+
+            # display the label and bounding box rectangle on the output
+            # frame
+            cv2.putText(frame, label, (startX, startY - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+            cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
+
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         encodedImage = jpeg.tobytes()
+        global WebDetectFrame
+        WebDetectFrame = b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n'
 
-        # yield the output frame in the byte format
-        yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+
+def YealdRawFrame():
+    while True:
+        #print("Frame")
+        yield(WebRawFrame)
+
+def YealdDetectFrame():
+    while True:
+        yield(WebDetectFrame)
+
 
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server)
+app.layout = html.Div([html.H1("Webcam Test"), html.Img(src="/raw_video_feed"), html.Img(src="/detect_video_feed")])
+#app.layout = html.Div([html.H1("Webcam Test"), html.Img(src="/raw_video_feed")])
 
-@server.route('/video_feed')
-def video_feed():
-    return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-app.layout = html.Div([html.H1("Webcam Test"), html.Img(src="/video_feed")])
+@server.route('/raw_video_feed')
+def raw_video_feed():
+    return Response(YealdRawFrame(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+@server.route('/detect_video_feed')
+def detect_video_feed():
+    return Response(YealdDetectFrame(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@server.route('/setcamera/<address>')
+def SetCamera(address):
+
+    global Camera
+    global Frame
+    global CameraRun
+    global CameraThread
+    global GenRawJPEGThread
+    global GenDetectJPEGThread
+    global Address
+
+    Address = address
+
+    CameraRun = False
+
+    if CameraThread != None:
+        CameraThread.join()
+
+
+    for i in range(0,5):
+        capture = cv2.VideoCapture("rtsp://" + address + ":5554/cam", cv2.CAP_FFMPEG)
+        capture.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+        time.sleep(2)
+        if capture.isOpened():
+            Camera=capture
+            break
+
+    if Camera == None:
+        return "Unable to add Camera " + address
+
+    CameraRun = True
+    CameraThread = Thread(target=VideoCamera, args=())
+    CameraThread.daemon = True
+    CameraThread.start()
+
+    time.sleep(2)
+
+    if GenRawJPEGThread == None:
+        print("Start Raw Thread")
+        GenRawJPEGThread = Thread(target=GenerateRawWebFrame, args=())
+        GenRawJPEGThread.daemon = True
+        GenRawJPEGThread.start()
+
+    #if GenDetectJPEGThread == None:
+    #    print("Start Detect Thread")
+    #    GenDetectJPEGThread = Thread(target=GenerateDetectWebFrame, args=())
+    #    GenDetectJPEGThread.daemon = True
+    #    GenDetectJPEGThread.start()
+
+    return "Successfully added Camera at " + address
 
 if __name__ == '__main__':
 
-    # construct the argument parser and parse the arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-f", "--face", type=str,
-        default="face_detector",
-        help="path to face detector model directory")
-    ap.add_argument("-m", "--model", type=str,
-        default="mask_detector.model",
-        help="path to trained face mask detector model")
-    ap.add_argument("-c", "--confidence", type=float, default=0.5,
-        help="minimum probability to filter weak detections")
-    args = vars(ap.parse_args())
-
-
-    # load our serialized face detector model from disk
-    print("[INFO] loading face detector model...")
-    prototxtPath = os.path.sep.join([args["face"], "deploy.prototxt"])
-    weightsPath = os.path.sep.join([args["face"],"res10_300x300_ssd_iter_140000.caffemodel"])
+    CodePath = "/maskdetector/DetectCode/"
+    prototxtPath = os.path.sep.join([CodePath, "face_detector", "deploy.prototxt"])
+    weightsPath  = os.path.sep.join([CodePath, "face_detector", "res10_300x300_ssd_iter_140000.caffemodel"])
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
-
-    # load the face mask detector model from disk
-    print("[INFO] loading face mask detector model...")
-    maskNet = load_model(args["model"])
+    maskNet = load_model(os.path.sep.join([CodePath, "mask_detector.model"]))
 
     app.run_server(debug=True, port='8080', host='0.0.0.0')
-    
