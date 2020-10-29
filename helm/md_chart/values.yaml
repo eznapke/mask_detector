@@ -16,7 +16,6 @@ fullnameOverride: ""
 service:
   type: LoadBalancer
   port: 8080
-  externalIP: "172.28.128.81"
 
 configmap:
   namespace: md-service
