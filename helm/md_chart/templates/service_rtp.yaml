@@ -99,5 +99,3 @@ spec:
   selector:
     app/name: {{ include "md_chart.name" . }}
     app/instance: {{ .Release.Name }}
-  externalIPs:
-    - {{ .Values.service.externalIP }}
